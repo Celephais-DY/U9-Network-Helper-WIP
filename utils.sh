@@ -8,7 +8,7 @@
 # UTILITIES #
 #############
 
-arrayCreatList() {
+arrayCreateList() {
     local arrayContent
     local listNumber
     for arrayContent in "${arrayList[@]}"; do

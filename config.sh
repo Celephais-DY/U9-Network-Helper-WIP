@@ -2,9 +2,9 @@
 #shellcheck disable=SC2034
 
 # Script Version
-version=0.1
+version=0.2
 CONF_OPTIONS=("Adapter Configuration" "Change repositories to 'old'" "DHCP configuration helper")
 
-# Network Instance directory
+# Network Instance directory (Current directory used for testing)
 
 INSTANCE_FOLDER="$HOME/Documentos/Test"
