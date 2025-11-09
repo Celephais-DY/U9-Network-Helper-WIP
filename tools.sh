@@ -52,7 +52,7 @@ networkHelper(){
 
         # local variable for all user inputs.
         local userInput="none"
-        local _userInput2="none" # In case userInput is not available
+        local _userInput2="none" # In case userInput is not available (might get removed later)
         
 
         # Lists all interfaces that are DOWN and put them on ethernetCards array.
@@ -87,9 +87,6 @@ networkHelper(){
                 fi
         done
         
-        # Creates backup of Interfaces file
-        cp "$INSTANCE_FOLDER/test.txt" "$INSTANCE_FOLDER/test.bkp"
-
         # Decides if configuration is going to use dhcp or not
         echo "Is the card going to use DHCP?[YES/no]"; if userConfirmation; then useDhcp=true; fi
         
@@ -109,12 +106,18 @@ networkHelper(){
                        
 
                         if userConfirmation; then
-                                 {
-                                printf "\n\n# Network card '%s' dhcp configuration\n" "${ethernetCards[$userInput]}"
-                                printf "auto %s\n" "${ethernetCards[$userInput]}"
-                                printf "iface %s inet dhcp" "${ethernetCards[$userInput]}"  
-                                } >> "$INSTANCE_FOLDER/test.txt"
-                                echo " "
+
+                                sudo bash -c '
+                                        # Creates backup of Interfaces file
+                                        cp "$INSTANCE_FOLDER/test.txt" "$INSTANCE_FOLDER/test.bkp"
+                                        
+                                        {
+                                        printf "\n\n# Network card '%s' dhcp configuration\n" "${ethernetCards[$userInput]}"
+                                        printf "auto %s\n" "${ethernetCards[$userInput]}"
+                                        printf "iface %s inet dhcp" "${ethernetCards[$userInput]}"  
+                                        } >> "$INSTANCE_FOLDER/test.txt"
+                                        echo " "
+                                '
                         fi
 
                         return 0
@@ -144,18 +147,21 @@ networkHelper(){
                         printf "broadcast %s\n" "$ipBroadcast"
 
                         if userConfirmation; then
-                                 {
+                                 sudo bash -c '
+                                        # Creates backup of Interfaces file
+                                        cp "$INSTANCE_FOLDER/test.txt" "$INSTANCE_FOLDER/test.bkp"
+                                        {
 
-                                printf "\n\n# Network card '%s' static IP configuration\n" "${ethernetCards[$userInput]}"
-                                printf "auto %s\n" "${ethernetCards[$userInput]}"
-                                printf "iface %s inet static" "${ethernetCards[$userInput]}"
-          
-                                printf "address %s\n" "$ipAddress" 
-                                printf "netmask %s\n" "$ipMask"
-                                printf "network %s\n" "$ipNetwork"
-                                printf "broadcast %s\n" "$ipBroadcast"
-                                } >> "$INSTANCE_FOLDER/test.txt"
-
+                                        printf "\n\n# Network card '%s' static IP configuration\n" "${ethernetCards[$userInput]}"
+                                        printf "auto %s\n" "${ethernetCards[$userInput]}"
+                                        printf "iface %s inet static" "${ethernetCards[$userInput]}"
+                
+                                        printf "address %s\n" "$ipAddress" 
+                                        printf "netmask %s\n" "$ipMask"
+                                        printf "network %s\n" "$ipNetwork"
+                                        printf "broadcast %s\n" "$ipBroadcast"
+                                        } >> "$INSTANCE_FOLDER/test.txt" 
+                                '
                                 echo "Static Network configuration finished. Leaving..."
 
                                 break
