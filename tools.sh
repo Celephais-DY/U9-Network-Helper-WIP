@@ -52,7 +52,7 @@ networkHelper(){
 
         # local variable for all user inputs.
         local userInput="none"
-        local userInput2="none" # In case userInput is not available
+        local _userInput2="none" # In case userInput is not available
         
 
         # Lists all interfaces that are DOWN and put them on ethernetCards array.
@@ -67,7 +67,7 @@ networkHelper(){
          
          # List all unconfigured ethernet cards for the user.
         arrayList=("${ethernetCards[@]}")
-        arrayCreatList
+        arrayCreateList
 
                 read -r userInput
                 userInput=$(( userInput - 1 ))
@@ -91,31 +91,29 @@ networkHelper(){
         cp "$INSTANCE_FOLDER/test.txt" "$INSTANCE_FOLDER/test.bkp"
 
         # Decides if configuration is going to use dhcp or not
-        echo "Is the card going to use DHCP?[YES/no]"
-                if userConfirmation; then
-                        {
-                        printf "\n\n# Network card '%s' dhcp configuration\n" "${ethernetCards[$userInput]}"
-                        printf "auto %s\n" "${ethernetCards[$userInput]}"
-                        printf "iface %s inet dhcp" "${ethernetCards[$userInput]}"  
-                        } >> "$INSTANCE_FOLDER/test.txt"
-                        useDhcp=true
-                else
-                        {
-                        printf "\n\n# Network card '%s' static IP configuration\n" "${ethernetCards[$userInput]}"
-                        printf "auto %s\n" "${ethernetCards[$userInput]}" >> "$INSTANCE_FOLDER/test.txt"
-                        printf "iface %s inet static" "${ethernetCards[$userInput]}" >> "$INSTANCE_FOLDER/test.txt" 
-                        } >> "$INSTANCE_FOLDER/test.txt"  
-                fi
-        # If using DHCP, no more configuration is needed.
+        echo "Is the card going to use DHCP?[YES/no]"; if userConfirmation; then useDhcp=true; fi
         
+        # Static IP configuration and configuration finisher.
+
         while true; do
                 if [[ $useDhcp == true ]]; then
 
-                        echo "Interface configuration for card was succesful!"
-                        echo "Would you like to see your configuration file?[YES/no]"
+                        printf "The following changes will be written:\n\n"
+
+                        printf "\n\n# Network card '%s' dhcp configuration\n" "${ethernetCards[$userInput]}"
+                        printf "auto %s\n" "${ethernetCards[$userInput]}"
+                        printf "iface %s inet dhcp\n\n" "${ethernetCards[$userInput]}"
+
+                        printf "Proceed with this cinfiguration?[YES/no]"
+
+                       
 
                         if userConfirmation; then
-                                cat "$INSTANCE_FOLDER/test.txt"
+                                 {
+                                printf "\n\n# Network card '%s' dhcp configuration\n" "${ethernetCards[$userInput]}"
+                                printf "auto %s\n" "${ethernetCards[$userInput]}"
+                                printf "iface %s inet dhcp" "${ethernetCards[$userInput]}"  
+                                } >> "$INSTANCE_FOLDER/test.txt"
                                 echo " "
                         fi
 
@@ -127,21 +125,31 @@ networkHelper(){
                         ipAddressInput
                         netMaskInput
 
-                        # Set up variable for use in broadcast and network.
+                        # Set up variable for use in 'broadcast' and 'network'.
                         ipNetwork=$ipAddress
                         ipNetwork=$(echo "$ipNetwork" | awk -F '.' -v OFS='.' '{$4=0; print}')
                         ipBroadcast=$ipAddress
                         ipBroadcast=$(echo "$ipNetwork" | awk -F '.' -v OFS='.' '{$4=255; print}')
 
                         # Adds all the configuration to file
-                        printf "The configuration bellow will be written. Do you want to continue?[YES/no]\n\n"
+                        printf "The configuration bellow will be written. Do you wish to continue?[YES/no]\n\n"
+
+
+                        printf "auto %s\n" "${ethernetCards[$userInput]}"
+                        printf "iface %s inet static\n" "${ethernetCards[$userInput]}"
+
                         printf "address %s\n" "$ipAddress"
                         printf "netmask %s\n" "$ipMask"
                         printf "network %s\n" "$ipNetwork"
                         printf "broadcast %s\n" "$ipBroadcast"
 
                         if userConfirmation; then
-                                {
+                                 {
+
+                                printf "\n\n# Network card '%s' static IP configuration\n" "${ethernetCards[$userInput]}"
+                                printf "auto %s\n" "${ethernetCards[$userInput]}"
+                                printf "iface %s inet static" "${ethernetCards[$userInput]}"
+          
                                 printf "address %s\n" "$ipAddress" 
                                 printf "netmask %s\n" "$ipMask"
                                 printf "network %s\n" "$ipNetwork"
