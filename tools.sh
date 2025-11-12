@@ -131,7 +131,7 @@ networkHelper(){
                         printf "auto %s\n" "${ethernetCards[$userInput]}"
                         printf "iface %s inet dhcp\n\n" "${ethernetCards[$userInput]}"
 
-                        printf "Proceed with this cinfiguration?[YES/no]"
+                        printf "Proceed with this configuration?[YES/no]"
 
                        
 

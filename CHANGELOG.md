@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.4 [11.12.25]
+- Fixed the input issue that allowed users to input any number after a zero, leading to invalid netmasks;
+- Fixed typo when configuring DHCP (#3);
+- Fixed compatibility errors with Ubuntu 9 (#3).
 
 ## Version 0.2.3 [11-11-25]
 - Warns the user if the specified path in config.conf contains the interfaces file (Currently, used for testing only).
