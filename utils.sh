@@ -63,7 +63,7 @@ ipAddressInput() {
                 if [[ $octet -le 254 ]]; then
                     
                     # If any octet contains '000' or '00' changes to a single 0.
-                    ipAddress=$(echo "$ipAddress" | IFS='.' sed -E 's/000|00/0/g')
+                    ipAddress=$(echo "$ipAddress" | IFS='.' sed -r 's/000|00/0/g')
                     return 0
                 else
 
@@ -123,26 +123,26 @@ netMaskInput() {
         
                 # Variables used to validate mask.
                 local iterationsCounter=0
-                local lastOctet=0
+                local lastOctet=false
 
 
                 # Validates each octet
                 for octet in "${ipArray[@]}"; do
                     
-                    if [[ $lastOctet -lt 255 && $octet -ge $lastOctet && $lastOctet -ne 0 ]]; then
+                    if [[ $lastOctet = true && $octet -ne 0 ]]; then
                         printf "The octet '%s' makes the mask not contiguous. Plase, try again.\n" "$octet"
                         break
                 
 
-                    elif [[ $(( 256 % (256 - octet ) )) -eq 0 && $octet -ge 128 && $octet -le 255 ]]; then
+                    elif [[ $(( 256 % (256 - octet ) )) -eq 0 && $octet -ge 128 && $octet -le 255 && $octet -ne 0 ]]; then
                         
-                        lastOctet=$octet
+                        lastOctet=true
                         iterationsCounter=$(( iterationsCounter + 1 ))
                         
 
                     elif [[ $octet -eq 0 ]]; then
                         
-                        lastOctet=$octet
+                        lastOctet=true
                         iterationsCounter=$(( iterationsCounter + 1 ))
                         
                     
@@ -217,7 +217,7 @@ binaryCalculator() {
     local octetsHBitsAmount
 
     # Verify if $octet var already exists. If not, create it.
-    if [[ ! -v $octet ]]; then
+    if [[ -z "$octet" ]]; then
         local octet
 
     fi
